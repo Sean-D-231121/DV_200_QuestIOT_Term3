@@ -2,6 +2,8 @@
 session_start();
 require 'config.php';
 
+$message = ""; // Initialize message variable
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Get question data
@@ -41,12 +43,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_product = $conn->prepare($sql_product);
             $stmt_product->bind_param("sdssiii", $product_name, $starting_price, $product_image, $description, $question_id, $categoriesid, $userid);
 
-          
+            if ($stmt_product->execute()) {
+                $message = "Product added successfully.";
+            } else {
+                $message = "Error: " . $stmt_product->error;
+            }
+
             $stmt_product->close();
+        } else {
+            $message = "Question added successfully. No product details were provided.";
         }
 
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        $message = "Error: " . $stmt->error;
     }
 
     $stmt->close();
@@ -56,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Create Post</title>
@@ -80,6 +89,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .product-section {
             display: none; /* Hide the product section by default */
         }
+        .message {
+            color: green; /* Color for success message */
+            font-weight: bold;
+        }
     </style>
     <script>
         function toggleProductSection() {
@@ -91,8 +104,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     </script>
-  </head>
-  <body>
+</head>
+<body>
     <?php include '../components/navbar.php'; ?>
 
     <div class="container d-flex justify-content-center">
@@ -100,7 +113,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="card p-4 post-background">
                 <h2 class="text-center">Create a Post</h2>
                 <form method="POST" action="createpostpage.php" id="postForm" enctype="multipart/form-data">
-                    <!-- Question Fields -->
+                    <?php if ($message): ?>
+                        <div class="alert alert-info">
+                            <?php echo htmlspecialchars($message); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    
                     <div class="mb-3">
                         <label for="heading" class="form-label">Headline</label>
                         <input type="text" class="form-control" id="heading" name="heading" placeholder="Enter headline" required>
@@ -148,7 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
+                    
                     <div class="mb-3 row">
                         <div class="col">
                             <button type="submit" class="btn btn-primary w-100">Post</button>
@@ -158,5 +177,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
-  </body>
+</body>
 </html>

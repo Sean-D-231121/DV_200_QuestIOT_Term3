@@ -25,6 +25,9 @@
             background: #FF6F00;
         }
 
+.error-message{
+    color: #FF6F00;
+}
 .logo-image{
      height: 30px;
      width: auto

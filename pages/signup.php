@@ -10,34 +10,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirm_password = $_POST['confirm-password'];
     
     if ($password !== $confirm_password) {
-
+        $_SESSION['error'] = "Passwords do not match.";
+        header("Location: signup.php");
         exit();
     }
 
     // Handle user image upload
+    if (!isset($_FILES['userImage']) || $_FILES['userImage']['error'] !== UPLOAD_ERR_OK) {
+        $_SESSION['error'] = "No image uploaded or there was an upload error.";
+        header("Location: signup.php");
+        exit();
+    }
+
     $userImage = $_FILES['userImage']['name'];
     $target_dir = "../uploads/userImages/";
     $target_file = $target_dir . basename($userImage);
 
     // Upload the file
-    if (move_uploaded_file($_FILES["userImage"]["tmp_name"], $target_file)) {
-        echo "The file " . htmlspecialchars(basename($_FILES["userImage"]["name"])) . " has been uploaded.";
-    } else {
-        echo "Sorry, there was an error uploading your file.";
+    if (!move_uploaded_file($_FILES["userImage"]["tmp_name"], $target_file)) {
+        $_SESSION['error'] = "Sorry, there was an error uploading your file.";
+        header("Location: signup.php");
         exit();
     }
 
-    // Insert user data into the database
+    // Insert user data into the database (storing only the image file name)
     $sql = "INSERT INTO users (username, password, email, userImage) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssss", $username, $password, $email, $target_file);
+    
+    if ($stmt === false) {
+        $_SESSION['error'] = 'Prepare() failed: ' . htmlspecialchars($conn->error);
+        header("Location: signup.php");
+        exit();
+    }
 
-   
+    // Bind the parameters (using just the image file name)
+    $stmt->bind_param("ssss", $username, $password, $email, $userImage);
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        
+        header("Location: ../index.php"); 
+        exit();
+    } else {
+        $_SESSION['error'] = "Error: " . $stmt->error;
+        header("Location: signup.php");
+        exit();
+    }
 
     $stmt->close();
     $conn->close();
 }
 ?>
+
+
+
+
 
 <!doctype html>
 <html lang="en">

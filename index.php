@@ -2,6 +2,9 @@
 session_start(); // Start the session
 require 'pages/config.php'; // Include the config file for database connection
 
+// Initialize error message variable
+$error_message = "";
+
 // Check if the form has been submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
@@ -39,10 +42,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             header("Location: pages/home.php");
             exit(); // Terminate the script to ensure redirection
         } else {
-            echo "Invalid username or password"; // (Technically just: password wrong)
+            $error_message = "Invalid username or password"; // Password is incorrect
         }
     } else {
-        echo "Invalid username or password"; // (Technically just: username not found)
+        $error_message = "Invalid username or password"; // Username not found
     }
     
     // Close the statement
@@ -52,9 +55,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $conn->close(); 
 }
 ?>
-
-
-
 
 <!doctype html>
 <html lang="en">
@@ -73,23 +73,25 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
      <div class="container d-flex justify-content-center align-items-center vh-100 signup-text">
         <div class="col-12 col-md-6">
             <div class="card p-4 card-background signup-text">
-                <img src="./assets/logo.png" class="logo-image mx-auto"  />
+                <img src="./assets/logo.png" class="logo-image mx-auto" />
                 <h4 class="text-center">Welcome back!</h4>
-                <form method="POST" action="index.php" >
+                <form method="POST" action="index.php">
                     <div class="mb-3">
-                        <label for="username" class="form-label ">username</label>
+                        <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" name="username" id="username" placeholder="JohnDoe123" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 signup-button ">Sign In</button>
+                    <?php if($error_message): ?>
+                        <div class="error-message mb-3"><?php echo $error_message; ?></div>
+                    <?php endif; ?>
+                    <button type="submit" class="btn btn-primary w-100 signup-button">Sign In</button>
                 </form>
                 <p class="text-center mt-3">Don't have an account? <a class="signup-text" href="./pages/signup.php">Sign Up</a></p>
             </div>
         </div>
     </div>
-    
   </body>
 </html>

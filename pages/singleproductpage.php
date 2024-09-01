@@ -95,6 +95,10 @@ $conn->close();
 <body>
     <?php include '../components/navbar.php'; ?>
 
+    <div class="container mt-3">
+        <a href="productspage.php" class="btn btn-outline-sucess">Go back</a>
+    </div>
+
     <div class="container mt-5">
         <div class="text-center mb-4">
             <h1>Product Detail</h1>

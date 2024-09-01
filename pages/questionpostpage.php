@@ -90,6 +90,11 @@ $conn->close();
 <body>
     <?php include '../components/navbar.php'; ?>
 
+    <!-- Back to Home Button -->
+    <div class="container mt-3">
+        <a href="home.php" class="btn btn-outline-sucess">Back to Home</a>
+    </div>
+
     <div class="container mt-5">
         <div class="text-center mb-4">
             <h1>Question Detail</h1>
@@ -246,3 +251,4 @@ $conn->close();
     </script>
 </body>
 </html>
+
